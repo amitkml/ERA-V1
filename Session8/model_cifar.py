@@ -110,3 +110,6 @@ class Net(nn.Module):
         x = self.fc1(x)
         
         return F.log_softmax(x, dim=-1)
+    
+    def model_cifar():
+        return Net()

@@ -83,12 +83,12 @@ def test(model, device, test_loader, criterion, L1_loss_enable=False):
     return np.round(acc,2), test_loss
 
 # training the model epoc wise
-def build_model(model, device, trainloader, testloader, epochs, L1_loss_flag=False, L2_penalty_val=0):
+def build_model(model, device, trainloader, testloader, epochs, L1_loss_flag=False, L2_penalty_val=0, lr=0.1):
 
     #criterion = F.nll_loss()
     criterion = nn.CrossEntropyLoss()
     #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=L2_penalty_val)
+    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=L2_penalty_val)
     scheduler = StepLR(optimizer, step_size=8, gamma=0.1)
 
     train_losses = []

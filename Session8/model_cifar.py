@@ -20,19 +20,19 @@ class Net(nn.Module):
         
         ## CONVOLUTION BLOCK 1
         self.convblock1 = nn.Sequential(
-            nn.Conv2d(in_channels = 3, out_channels = 32, kernel_size = (3,3), stride=1, padding=1),
+            nn.Conv2d(in_channels = 3, out_channels = 16, kernel_size = (3,3), stride=1, padding=1),
 #             nn.Conv2d(in_channels=3, out_channels=33, kernel_size=(3, 3), padding=1, groups = 3, bias=False),
 #             nn.Conv2d(in_channels=33, out_channels=16, kernel_size=(1, 1), padding=1, bias=False),
-            nn.BatchNorm2d(32),
+            nn.BatchNorm2d(16),
             nn.Dropout(dropout_value),
             nn.ReLU()
         ) # input_size = 32 output_size = 32 receptive_field = 3
         
         self.convblock2 = nn.Sequential(
 #             nn.ConvTranspose2d(in_channels = 3, out_channels = 32, kernel_size = (3,3), stride=2, padding=1),
-            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=(3, 3), padding=1, groups = 32, bias=False),
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(1, 1), padding=0, bias=False),
-            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), padding=1, groups = 16, bias=False),
+            nn.Conv2d(in_channels=32, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),
+            nn.BatchNorm2d(8),
             nn.Dropout(dropout_value),
             nn.ReLU()
         ) # input_size = 32 output_size = 32 receptive_field = 5
@@ -44,17 +44,17 @@ class Net(nn.Module):
         ## CONVOLUTION BLOCK 2
         self.convblock3 = nn.Sequential(
             # Dilated Convolution of 3
-            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), padding=1,dilation = 1, bias=False),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=1,dilation = 1, bias=False),
+            nn.BatchNorm2d(16),
             nn.Dropout(dropout_value),
             nn.ReLU(),
         ) # input_size = 16 output_size = 16 receptive_field = 14
         
         self.convblock4 = nn.Sequential(
             # Dilated Convolution of 3
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), padding=1, groups = 32, bias=False),
-            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=(1, 1), padding=0, bias=False),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), padding=1, groups = 16, bias=False),
+            nn.Conv2d(in_channels=32, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),
+            nn.BatchNorm2d(8),
             nn.Dropout(dropout_value),
             nn.ReLU(),
         ) # input_size = 16 output_size = 16 receptive_field = 16
@@ -64,24 +64,24 @@ class Net(nn.Module):
         
         ## CONVOLUTION BLOCK 3
         self.convblock5 = nn.Sequential(
-            nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), padding=1, dilation = 2, bias=False),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=1, dilation = 2, bias=False),
+            nn.BatchNorm2d(16),
             nn.Dropout(dropout_value),
             nn.ReLU()
         ) # input_size = 6   output_size = 6 receptive_field = 35       
         
         self.convblock6 = nn.Sequential(
-            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=(3, 3), padding=1, dilation = 1, groups = 32, bias=False),
-            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=(1, 1), padding=0, bias=False),
-            nn.BatchNorm2d(128),
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), padding=1, dilation = 1, groups = 16, bias=False),
+            nn.Conv2d(in_channels=32, out_channels=8, kernel_size=(1, 1), padding=0, bias=False),
+            nn.BatchNorm2d(8),
             nn.Dropout(dropout_value),
             nn.ReLU()
         ) # input_size = 6   output_size = 6 receptive_field = 39 
         
         ## CONVOLUTION BLOCK 4
         self.convblock7 = nn.Sequential(
-            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=(3, 3), padding=1, dilation = 1, bias=False),
-            nn.BatchNorm2d(256),
+            nn.Conv2d(in_channels=8, out_channels=16, kernel_size=(3, 3), padding=1, dilation = 1, bias=False),
+            nn.BatchNorm2d(16),
             nn.Dropout(dropout_value),
             nn.ReLU()
         ) # input_size = 8   output_size = 8 receptive_field = 43
@@ -96,7 +96,7 @@ class Net(nn.Module):
         
         
         self.gap = nn.AvgPool2d(kernel_size=(6,6))        
-        self.fc1 = nn.Linear(256, 10)
+        self.fc1 = nn.Linear(16, 10)
 
     def forward(self, x):
         x = self.pool1(self.convblock2(self.convblock1(x)))
@@ -105,8 +105,8 @@ class Net(nn.Module):
         x = self.convblock7(x)
 #         x = self.convblock8(self.convblock7(x))
         x = self.gap(x)
-#         print(x.shape)
-        x = x.view(-1, 256)
+        # print(x.shape)
+        x = x.view(x.size(0),-1)
         x = self.fc1(x)
         
         return F.log_softmax(x, dim=-1)

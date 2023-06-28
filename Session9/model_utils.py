@@ -1,30 +1,38 @@
-import data_augmentation.albumentations as A
+from __future__ import print_function
 import torch
-import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.optim.lr_scheduler import StepLR
-from torchsummary import summary
-
 import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
-import os 
+from torchsummary import summary
+import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.optim.lr_scheduler import StepLR
 import numpy as np
 import matplotlib.pyplot as plt
-import torch
+import regularization
 from tqdm import tqdm
 
-import model_utility.data_utils as dutils
-import model_utility.model_utils as mutils
-import model_utility.plot_utils as putils 
-import model_utility.regularization as regularization
-import tsai_models.model_cifar as model_cifar
 
-import tsai_models.models as mod
+from torchvision import transforms
+import albumentations as A
+import albumentations.pytorch as AP
+import random
+import numpy as np
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+# class AlbumentationTransforms:
+#   """
+#   Helper class to create test and train transforms using Albumentations
+#   """
+#   def __init__(self, transforms_list=[]):
+#     transforms_list.append(AP.ToTensorV2())
 
+#     self.transforms = A.Compose(transforms_list)
+
+
+#   def __call__(self, img):
+#     img = np.array(img)
+#     #print(img)
+#     return self.transforms(image=img)['image']
 
 
 
@@ -96,12 +104,12 @@ def test(model, device, test_loader, criterion, L1_loss_enable=False):
     return np.round(acc,2), test_loss
 
 # training the model epoc wise
-def build_model(model, device, trainloader, testloader, epochs, L1_loss_flag=False, L2_penalty_val=0):
+def build_model(model, device, trainloader, testloader, epochs, L1_loss_flag=False, L2_penalty_val=0, lr=0.1):
 
     #criterion = F.nll_loss()
     criterion = nn.CrossEntropyLoss()
     #optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=L2_penalty_val)
+    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9, weight_decay=L2_penalty_val)
     scheduler = StepLR(optimizer, step_size=8, gamma=0.1)
 
     train_losses = []

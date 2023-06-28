@@ -1,6 +1,4 @@
-# from __future__ import print_function
-import data_augmentation.albumentations as A
-
+from __future__ import print_function
 import torch
 import torch.optim as optim
 from torchvision import datasets, transforms
@@ -12,19 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import os 
 import numpy as np
-
-
-import model_utility.data_utils as dutils
-import model_utility.model_utils as mutils
-import model_utility.plot_utils as putils 
-import model_utility.regularization as regularization
-
-import tsai_models.model_cifar as model_cifar
-import tsai_models.models as mod
-
 import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 brightness_val =0.13
 cantrast_val = 0.1
@@ -32,7 +18,7 @@ saturation_val = 0.10
 Random_rotation_val = (-7.0, 7.0) 
 fill_val = (1,)
 
-normalize_val = (0.5, 0.5, 0.5) #need to give as tuple
+normalize_val = (0.5, 0.5, 0.5) # need to give as tuple
 
 def get_data_transform():
     # Train Phase transformation
@@ -72,17 +58,11 @@ def get_device():
 
 
 def get_dataset(train_transforms, test_transforms,path):
-    print('File saving at ->',path)
     trainset = datasets.CIFAR10(path, train=True, download=True, transform=train_transforms)
     testset = datasets.CIFAR10(path, train=False, download=True, transform=test_transforms)
     return trainset, testset
 
-def get_dataloader(batch_size, num_workers, cuda, path ):
-    print('Saving model Files @ {}'.formate(path))
-    if path == 'default':
-        path = os.getcwd()
-    else:
-        pass
+def get_dataloader(batch_size, num_workers, cuda,path):
     
     print("Running over Cuda !! ", cuda)
     dataloader_args = dict(shuffle=True, batch_size=batch_size, num_workers=4, pin_memory=True) if cuda else dict(shuffle=True, batch_size=8)

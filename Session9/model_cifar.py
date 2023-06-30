@@ -19,7 +19,7 @@ import torch.nn.functional as F
 
 
 class Net(nn.Module):
-    def __init__(self, dropout_value = 0.001, num_classes=10):
+    def __init__(self, dropout_value = 0.0015, num_classes=10):
         super(Net, self).__init__()
 
         # Convolution Block 1
@@ -47,7 +47,9 @@ class Net(nn.Module):
         self.global_avg_pool = nn.AdaptiveAvgPool2d(1)
 
         # Fully Connected Layer
-        self.fc = nn.Linear(128, num_classes)
+
+        self.fc1 = nn.Linear(128, 32)
+        self.fc = nn.Linear(32, num_classes)
 
     def forward(self, x):
         # Convolution Block 1
@@ -70,10 +72,9 @@ class Net(nn.Module):
         x = x.view(x.size(0), -1)
 
         # Fully Connected Layer
-        x = self.fc(x)
+        x = self.fc(self.fc1(x))
 
         return F.log_softmax(x, dim=-1)
-
 
 def model():
     return Net()

@@ -9,7 +9,7 @@ import torchvision.transforms as transforms
 import pytorch_lightning as pl
 from torchmetrics import Accuracy
 from utils.helper import seed_everything, get_default_device, calculate_mean_std
-mean, std = calculate_mean_std("CIFAR10")
+
 
 
 def apply_transforms_custom_resnet(mean, std):
@@ -73,13 +73,16 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=
 
 # Define LightningDataModule for data loading
 class CIFAR10DataModule(pl.LightningDataModule):
-    def __init__(self, data_dir='./data', batch_size=128, mean =mean, std=std):
+    def __init__(self, data_dir='./data', batch_size=128):
+        
         super().__init__()
+        self.mean, self.std = calculate_mean_std("CIFAR10")
         self.data_dir = data_dir
         self.batch_size = batch_size
-        self.train_dataset = train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=apply_transforms_custom_resnet(mean, std))
-        self.test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=apply_transforms_custom_resnet(mean, std))
-        self.transform = apply_transforms_custom_resnet(mean,std)
+        self.train_transforms, self.test_transforms = apply_transforms_custom_resnet(mean, std)
+        self.train_dataset = train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=self.train_transforms)
+        self.test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=self.test_transforms)
+        self.transform = apply_transforms_custom_resnet(self.mean,self.std)
 
     def prepare_data(self):
         # Download the dataset if needed
@@ -89,18 +92,18 @@ class CIFAR10DataModule(pl.LightningDataModule):
     def setup(self, stage=None):
         # Assign train/val datasets for use in dataloaders
         if stage == 'fit' or stage is None:
-            self.train_dataset = torchvision.datasets.CIFAR10(root=self.data_dir, train=True, transform=self.transform)
+            self.train_dataset = torchvision.datasets.CIFAR10(root=self.data_dir, train=True, transform=self.train_transforms)
         if stage == 'test' or stage is None:
-            self.test_dataset = torchvision.datasets.CIFAR10(root=self.data_dir, train=False, transform=self.transform)
+            self.test_dataset = torchvision.datasets.CIFAR10(root=self.data_dir, train=False, transform=self.test_transforms)
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=4)
+        return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=1)
 
     def val_dataloader(self):
-        return torch.utils.data.DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4)
+        return torch.utils.data.DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=1)
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4)
+        return torch.utils.data.DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=1)
     
 
 def apply_transforms(mean, std):

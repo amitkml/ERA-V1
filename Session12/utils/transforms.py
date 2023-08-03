@@ -77,6 +77,8 @@ class CIFAR10DataModule(pl.LightningDataModule):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
+        self.train_dataset = train_dataset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=apply_transforms_custom_resnet(mean, std))
+        self.test_dataset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=apply_transforms_custom_resnet(mean, std))
         self.transform = apply_transforms_custom_resnet(mean,std)
 
     def prepare_data(self):

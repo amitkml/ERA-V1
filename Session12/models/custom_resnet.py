@@ -9,6 +9,10 @@ from torch.optim.lr_scheduler import StepLR
 import pytorch_lightning as pl
 from torchmetrics import Accuracy
 from torch.optim.lr_scheduler import OneCycleLR
+from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+from torchmetrics import Accuracy
+
 
 class BasicBlock(nn.Module):
     """

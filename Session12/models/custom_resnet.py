@@ -8,6 +8,7 @@ import torch.nn as nn
 from torch.optim.lr_scheduler import StepLR
 import pytorch_lightning as pl
 from torchmetrics import Accuracy
+from torch.optim.lr_scheduler import OneCycleLR
 
 class BasicBlock(nn.Module):
     """
@@ -46,7 +47,7 @@ class CustomResNetClass(pl.LightningModule):
     ResNet Architecture.
     """
 
-    def __init__(self, block, num_blocks, num_classes=10, lambda_l1=0.0, grad_clip=None):
+    def __init__(self, block, num_blocks, num_classes=10, max_lr=0.1, steps_per_epoch=None, div_factor=10, pct_start=0.3):
         super(CustomResNetClass, self).__init__()
         self.in_planes = 64
 
@@ -112,7 +113,13 @@ class CustomResNetClass(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
-        scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
+        # scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
+         # Create OneCycleLR scheduler
+        scheduler = OneCycleLR(optimizer, max_lr=self.max_lr, 
+                               steps_per_epoch=self.steps_per_epoch,
+                                 div_factor=self.div_factor, 
+                                 pct_start=self.pct_start)
+        
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
 
     def test_step(self, batch, batch_idx):

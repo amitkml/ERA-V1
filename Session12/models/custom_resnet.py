@@ -124,13 +124,13 @@ class CustomResNetClass(pl.LightningModule):
     def configure_optimizers(self):
         # optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
         optimizer = torch.optim.SGD(self.parameters(), lr=0.001,momentum=0.9, weight_decay = 0.005)
-        # scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
+        scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
          # Create OneCycleLR scheduler
         print("details", self.steps_per_epoch,self.max_lr, self.div_factor, self.pct_start)
-        scheduler = OneCycleLR(optimizer, max_lr=self.max_lr, 
-                               steps_per_epoch=self.steps_per_epoch,
-                               div_factor=self.div_factor, 
-                               pct_start=self.pct_start)
+        # scheduler = OneCycleLR(optimizer, max_lr=self.max_lr, 
+        #                        steps_per_epoch=self.steps_per_epoch,
+        #                        div_factor=self.div_factor, 
+        #                        pct_start=self.pct_start)
         
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
 

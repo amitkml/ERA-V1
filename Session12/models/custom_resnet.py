@@ -108,10 +108,11 @@ class CustomResNetClass(pl.LightningModule):
                 l1 = l1 + p.abs().sum()
                 loss = loss + self.lambda_l1 * l1
 
-        self.log("train_loss", loss, prog_bar=True)
+        # self.log("train_loss", loss, prog_bar=True)
         acc = self.train_acc(y_pred, target)
         # self.log("train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log("train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        # self.log("train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
         return loss
 
@@ -119,15 +120,17 @@ class CustomResNetClass(pl.LightningModule):
         data, target = batch
         y_pred = self(data)
         loss = F.cross_entropy(y_pred, target)
-        self.log("val_loss", loss, prog_bar=True)
+        # self.log("val_loss", loss, prog_bar=True)
         acc = self.train_acc(y_pred, target)
         # self.log("val_acc", acc, prog_bar=True)
         # self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log("val_acc", loss, "val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        # self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("val_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        # self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
-        optimizer = torch.optim.SGD(self.parameters(), lr=0.01918839050131926,momentum=0.9, weight_decay = 0.005)
+        optimizer = torch.optim.SGD(self.parameters(), lr=0.0191926,momentum=0.9, weight_decay = 0.005)
         scheduler = StepLR(optimizer, step_size=self.step_size, gamma=0.1)
          # Create OneCycleLR scheduler
         print("details", self.steps_per_epoch,self.max_lr, self.div_factor, self.pct_start)

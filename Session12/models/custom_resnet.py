@@ -53,7 +53,7 @@ class CustomResNetClass(pl.LightningModule):
 
     def __init__(self, block=BasicBlock, num_blocks=[2, 2, 2, 2], num_classes=10, max_lr=0.1, 
                  steps_per_epoch=391, div_factor=10, pct_start=0.3,
-                 lambda_l1=0.0, grad_clip=None):
+                 lambda_l1=0.0, step_size = 25, grad_clip=None):
         super(CustomResNetClass, self).__init__()
         self.in_planes = 64
         self.steps_per_epoch = steps_per_epoch
@@ -62,6 +62,7 @@ class CustomResNetClass(pl.LightningModule):
         self.lambda_l1 = lambda_l1
         self.grad_clip = grad_clip
         self.max_lr = max_lr
+        self.step_size = step_size
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3,
                                stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
@@ -122,12 +123,12 @@ class CustomResNetClass(pl.LightningModule):
         acc = self.train_acc(y_pred, target)
         # self.log("val_acc", acc, prog_bar=True)
         # self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("val_acc", loss, "val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
         optimizer = torch.optim.SGD(self.parameters(), lr=0.01918839050131926,momentum=0.9, weight_decay = 0.005)
-        scheduler = StepLR(optimizer, step_size=self.steps_per_epoch, gamma=0.1)
+        scheduler = StepLR(optimizer, step_size=self.step_size, gamma=0.1)
          # Create OneCycleLR scheduler
         print("details", self.steps_per_epoch,self.max_lr, self.div_factor, self.pct_start)
         # scheduler = OneCycleLR(optimizer, max_lr=self.max_lr, 
@@ -142,7 +143,7 @@ class CustomResNetClass(pl.LightningModule):
         y_pred = self(data)
         loss = F.cross_entropy(y_pred, target)
         self.log("test_loss", loss, prog_bar=True)
-        acc = self.test_acc(y_pred, target)
+        acc = self.train_acc(y_pred, target)
         self.log("test_acc", acc, prog_bar=True)
 
 # import torch.nn as nn

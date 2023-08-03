@@ -109,8 +109,8 @@ class CustomResNetClass(pl.LightningModule):
 
         self.log("train_loss", loss, prog_bar=True)
         acc = self.train_acc(y_pred, target)
-        self.log("train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log("train_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
+        # self.log("train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("train_loss", loss, "train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
 
         return loss
 
@@ -121,8 +121,8 @@ class CustomResNetClass(pl.LightningModule):
         self.log("val_loss", loss, prog_bar=True)
         acc = self.train_acc(y_pred, target)
         # self.log("val_acc", acc, prog_bar=True)
-        self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
-        self.log("val_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
+        # self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("val_loss", loss, "val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.Adam(self.parameters(), lr=0.01)

@@ -115,7 +115,13 @@ class CustomResNetClass(pl.LightningModule):
         scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
 
-
+    def test_step(self, batch, batch_idx):
+        data, target = batch
+        y_pred = self(data)
+        loss = F.cross_entropy(y_pred, target)
+        self.log("test_loss", loss, prog_bar=True)
+        acc = self.test_acc(y_pred, target)
+        self.log("test_acc", acc, prog_bar=True)
 
 # import torch.nn as nn
 # import torch.nn.functional as F

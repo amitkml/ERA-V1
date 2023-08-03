@@ -56,7 +56,7 @@ class CustomResNetClass(pl.LightningModule):
                  lambda_l1=0.0, grad_clip=None):
         super(CustomResNetClass, self).__init__()
         self.in_planes = 64
-
+        self.steps_per_epoch = steps_per_epoch
         self.lambda_l1 = lambda_l1
         self.grad_clip = grad_clip
         self.max_lr = max_lr

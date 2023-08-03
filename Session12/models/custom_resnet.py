@@ -109,7 +109,8 @@ class CustomResNetClass(pl.LightningModule):
 
         self.log("train_loss", loss, prog_bar=True)
         acc = self.train_acc(y_pred, target)
-        self.log("train_acc", acc, prog_bar=True)
+        self.log("train_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("train_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
 
         return loss
 
@@ -119,12 +120,14 @@ class CustomResNetClass(pl.LightningModule):
         loss = F.cross_entropy(y_pred, target)
         self.log("val_loss", loss, prog_bar=True)
         acc = self.train_acc(y_pred, target)
-        self.log("val_acc", acc, prog_bar=True)
+        # self.log("val_acc", acc, prog_bar=True)
+        self.log("val_acc", acc, prog_bar=True, on_step=False, on_epoch=True)
+        self.log("val_loss", loss, prog_bar=True, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         # optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
-        optimizer = torch.optim.SGD(self.parameters(), lr=0.001,momentum=0.9, weight_decay = 0.005)
-        scheduler = StepLR(optimizer, step_size=20, gamma=0.1)
+        optimizer = torch.optim.SGD(self.parameters(), lr=0.04918839050131926,momentum=0.9, weight_decay = 0.005)
+        scheduler = StepLR(optimizer, step_size=self.steps_per_epoch, gamma=0.1)
          # Create OneCycleLR scheduler
         print("details", self.steps_per_epoch,self.max_lr, self.div_factor, self.pct_start)
         # scheduler = OneCycleLR(optimizer, max_lr=self.max_lr, 

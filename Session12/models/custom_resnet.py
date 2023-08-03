@@ -51,7 +51,7 @@ class CustomResNetClass(pl.LightningModule):
     ResNet Architecture.
     """
 
-    def __init__(self, block=BasicBlock, num_blocks=[2, 2, 2, 2], num_classes=10, max_lr=0.1, 
+    def __init__(self, block=BasicBlock, num_blocks=[2, 2, 2, 2], num_classes=10, max_lr=max_lr, 
                  steps_per_epoch=None, div_factor=10, pct_start=0.3,
                  lambda_l1=0.0, grad_clip=None):
         super(CustomResNetClass, self).__init__()
@@ -59,7 +59,7 @@ class CustomResNetClass(pl.LightningModule):
 
         self.lambda_l1 = lambda_l1
         self.grad_clip = grad_clip
-
+        self.max_lr = max_lr
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3,
                                stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
@@ -81,6 +81,7 @@ class CustomResNetClass(pl.LightningModule):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        # x = x.to(self.device)
         out = F.relu(self.bn1(self.conv1(x)))
         out = self.layer1(out)
         out = self.layer2(out)

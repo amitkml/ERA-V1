@@ -51,7 +51,9 @@ class CustomResNetClass(pl.LightningModule):
     ResNet Architecture.
     """
 
-    def __init__(self, block, num_blocks, num_classes=10, max_lr=0.1, steps_per_epoch=None, div_factor=10, pct_start=0.3):
+    def __init__(self, block=BasicBlock, num_blocks=[2, 2, 2, 2], num_classes=10, max_lr=0.1, 
+                 steps_per_epoch=None, div_factor=10, pct_start=0.3,
+                 lambda_l1=0.0, grad_clip=None):
         super(CustomResNetClass, self).__init__()
         self.in_planes = 64
 
@@ -207,8 +209,8 @@ class CustomResNetClass(pl.LightningModule):
 #         return out
 
 
-# def CustomResNet(norm_type="BN"):
-#     """
-#     Custom ResNet model.
-#     """
-#     return CustomResNetClass(BasicBlock, [2, 2, 2, 2])
+def CustomResNet(norm_type="BN"):
+    """
+    Custom ResNet model.
+    """
+    return CustomResNetClass(BasicBlock, [2, 2, 2, 2])
